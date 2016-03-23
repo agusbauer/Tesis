@@ -11,6 +11,7 @@ public String lexeme;
 %}
 %%
 {WHITE} {/*Ignore*/}
-"###" {lexeme=yytext(); return TITLE;}
+"###" {lexeme="<h2>"; return TITLE;}
+"**" {return NEGRO;}
 {L}({L}|{D})* {lexeme=yytext(); return ID;}
 . {return ERROR;}

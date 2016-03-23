@@ -26,7 +26,7 @@ import static jflex.Main.generate;
  */
 public class Main {
 
-     
+    static int negro = 0;
     /**
      * @param args the command line arguments
      */
@@ -42,7 +42,7 @@ public class Main {
         PrintWriter writer;
         try {
             writer = new PrintWriter(fichero);
-            writer.print("###esto es un titulo mediano");
+            writer.print("**esto esta en negrita**");
             writer.close();
         } catch (FileNotFoundException ex) {
             System.out.println("error");
@@ -61,10 +61,18 @@ public class Main {
             }
             switch (token){
                 case TITLE:
-                    System.out.println(lexer.lexeme);
-                    resultado=resultado+ "<h2>";
+                    //System.out.println();
+                    resultado=resultado+lexer.lexeme;
                     break;
-                
+                case NEGRO:
+                    if(negro == 0){
+                        negro = 1;
+                        resultado = resultado+"<b>";
+                    }else{
+                       resultado = resultado+"</b>"; 
+                       negro = 0;
+                    }
+                    break;
                 case ERROR:
                     resultado=resultado+ "Error, simbolo no reconocido ";
                     break;
