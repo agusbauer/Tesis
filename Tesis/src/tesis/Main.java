@@ -31,63 +31,47 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        //File file=new File("/Users/alangonzalez/Desktop/tesis/Tesis/Tesis/src/tesis/Lexer.flex");
-        //generate(file);
+        File file=new File("/Users/alangonzalez/Desktop/tesis/Tesis/Tesis/src/tesis/Lexer.flex");
+        generate(file);
+        System.out.println("\n***EJECUTANDO ANALIZADOR***\n");
         probarLexerFile();
     }
     
     public static void probarLexerFile() throws IOException{
-        File fichero = new File ("fichero.txt");
-        List<identificador> tokenslist = new LinkedList<identificador>();
-        PrintWriter writer;
-        try {
-            writer = new PrintWriter(fichero);
-            writer.print("**esto esta en negrita**");
-            writer.close();
-        } catch (FileNotFoundException ex) {
-            System.out.println("error");
-        }
         Reader reader = new BufferedReader(new FileReader("fichero.txt"));
         Lexer lexer = new Lexer (reader);
         String resultado="";
         while (true){
             Token token =lexer.yylex();
             if (token == null){
-                for(int i=0;i<tokenslist.size();i++){
-                    System.out.println(tokenslist.get(i).nombre);
-                }
                 System.out.println(resultado);
                 return;
             }
             switch (token){
                 case TITLE:
-                    //System.out.println();
-                    resultado=resultado+lexer.lexeme;
+                    System.out.println("encontre un titulo");
+                    
                     break;
-                case NEGRO:
-                    if(negro == 0){
+                case NEGRITA:
+                    /*if(negro == 0){
                         negro = 1;
                         resultado = resultado+"<b>";
                     }else{
                        resultado = resultado+"</b>"; 
                        negro = 0;
-                    }
+                    }*/
+                    System.out.println("encontre algo en negrita");
                     break;
                 case ERROR:
                     resultado=resultado+ "Error, simbolo no reconocido ";
                     break;
-                case ID: {
-                    identificador tokenitem=new identificador();
-                    tokenitem.nombre=lexer.lexeme;
-                    resultado = resultado+lexer.lexeme;
-                    tokenslist.add(tokenitem);
-                    
-                    
+                case TEXTO: {
+                    System.out.println("encontre solo texto");
                     break;
                 }
                 
                 default:
-                    resultado=resultado+ "<"+ lexer.lexeme + "> ";
+                    System.out.println("entre a default");
             }
     }
  }

@@ -5,5 +5,5 @@ package tesis;
  * @author Alan
  */
 public enum Token {
-    ID, TITLE, NEGRO, ERROR
+    TEXTO, TITLE, NEGRITA, ERROR
 }

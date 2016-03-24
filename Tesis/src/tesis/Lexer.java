@@ -33,7 +33,7 @@ class Lexer {
    * Translates characters to character classes
    */
   private static final String ZZ_CMAP_PACKED = 
-    "\11\0\1\3\1\3\1\7\1\7\1\3\22\0\1\4\2\0\1\5"+
+    "\11\0\1\0\1\4\1\7\1\7\1\3\22\0\1\1\2\0\1\5"+
     "\6\0\1\6\5\0\12\2\7\0\32\1\4\0\1\1\1\0\32\1"+
     "\12\0\1\7\u1fa2\0\1\7\1\7\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\uffff\0\udfe6\0";
 
@@ -48,10 +48,11 @@ class Lexer {
   private static final int [] ZZ_ACTION = zzUnpackAction();
 
   private static final String ZZ_ACTION_PACKED_0 =
-    "\1\0\1\1\1\2\2\3\2\1\1\0\1\4\1\5";
+    "\1\0\1\1\1\2\2\1\2\0\1\3\1\0\2\3"+
+    "\1\0\3\4";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[10];
+    int [] result = new int[15];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -76,11 +77,11 @@ class Lexer {
   private static final int [] ZZ_ROWMAP = zzUnpackRowMap();
 
   private static final String ZZ_ROWMAP_PACKED_0 =
-    "\0\0\0\10\0\20\0\10\0\20\0\30\0\40\0\50"+
-    "\0\10\0\10";
+    "\0\0\0\10\0\20\0\30\0\40\0\50\0\60\0\70"+
+    "\0\100\0\110\0\10\0\120\0\130\0\140\0\10";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[10];
+    int [] result = new int[15];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -103,12 +104,14 @@ class Lexer {
   private static final int [] ZZ_TRANS = zzUnpackTrans();
 
   private static final String ZZ_TRANS_PACKED_0 =
-    "\1\2\1\3\1\2\1\4\1\5\1\6\1\7\12\0"+
-    "\2\3\1\0\1\3\10\0\1\10\10\0\1\11\6\0"+
-    "\1\12\2\0";
+    "\1\2\1\3\1\2\2\0\1\4\1\5\12\0\2\3"+
+    "\12\0\1\6\10\0\1\7\6\0\1\10\3\0\1\11"+
+    "\6\0\3\10\1\12\1\13\3\10\1\0\2\11\3\0"+
+    "\1\14\5\0\1\13\11\0\1\15\1\0\3\15\1\16"+
+    "\1\17\3\15\4\0\1\17\3\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[48];
+    int [] result = new int[104];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -146,10 +149,11 @@ class Lexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\1\1\1\11\3\1\1\0\2\11";
+    "\1\0\1\11\3\1\2\0\1\1\1\0\1\1\1\11"+
+    "\1\0\2\1\1\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[10];
+    int [] result = new int[15];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -476,6 +480,58 @@ public String lexeme;
     while (true) {
       zzMarkedPosL = zzMarkedPos;
 
+      boolean zzR = false;
+      int zzCh;
+      int zzCharCount;
+      for (zzCurrentPosL = zzStartRead  ;
+           zzCurrentPosL < zzMarkedPosL ;
+           zzCurrentPosL += zzCharCount ) {
+        zzCh = Character.codePointAt(zzBufferL, zzCurrentPosL, zzMarkedPosL);
+        zzCharCount = Character.charCount(zzCh);
+        switch (zzCh) {
+        case '\u000B':
+        case '\u000C':
+        case '\u0085':
+        case '\u2028':
+        case '\u2029':
+          yyline++;
+          zzR = false;
+          break;
+        case '\r':
+          yyline++;
+          zzR = true;
+          break;
+        case '\n':
+          if (zzR)
+            zzR = false;
+          else {
+            yyline++;
+          }
+          break;
+        default:
+          zzR = false;
+        }
+      }
+
+      if (zzR) {
+        // peek one character ahead if it is \n (if we have counted one line too much)
+        boolean zzPeek;
+        if (zzMarkedPosL < zzEndReadL)
+          zzPeek = zzBufferL[zzMarkedPosL] == '\n';
+        else if (zzAtEOF)
+          zzPeek = false;
+        else {
+          boolean eof = zzRefill();
+          zzEndReadL = zzEndRead;
+          zzMarkedPosL = zzMarkedPos;
+          zzBufferL = zzBuffer;
+          if (eof) 
+            zzPeek = false;
+          else 
+            zzPeek = zzBufferL[zzMarkedPosL] == '\n';
+        }
+        if (zzPeek) yyline--;
+      }
       zzAction = -1;
 
       zzCurrentPosL = zzCurrentPos = zzStartRead = zzMarkedPosL;
@@ -545,23 +601,19 @@ public String lexeme;
           case 1: 
             { return ERROR;
             }
-          case 6: break;
+          case 5: break;
           case 2: 
-            { lexeme=yytext(); return ID;
+            { lexeme=yytext(); return TEXTO;
+            }
+          case 6: break;
+          case 3: 
+            { lexeme = yytext(); return TITLE;
             }
           case 7: break;
-          case 3: 
-            { /*Ignore*/
+          case 4: 
+            { lexeme=yytext(); return NEGRITA;
             }
           case 8: break;
-          case 4: 
-            { return NEGRO;
-            }
-          case 9: break;
-          case 5: 
-            { lexeme="<h2>"; return TITLE;
-            }
-          case 10: break;
           default:
             zzScanError(ZZ_NO_MATCH);
         }

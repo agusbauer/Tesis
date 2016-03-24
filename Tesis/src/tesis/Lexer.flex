@@ -3,15 +3,23 @@ import static tesis.Token.*;
 %%
 %class Lexer
 %type Token
-L = [a-zA-Z_ ]
-D = [0-9]
-WHITE=[ \t\r\n]
+%line
+
+TEXTO = [A-Za-z_ ][A-Za-z_0-9 ]*
+
+LineTerminator = \r|\n|\r\n
+WhiteSpace     = {LineTerminator} | [ \t\f]
+InputCharacter = [^\r\n]
+
+TITLE = "###" {InputCharacter}* {LineTerminator}?
+NEGRITA = "**" {TEXTO} "**" {InputCharacter}* {LineTerminator}?
+
 %{
 public String lexeme;
 %}
 %%
-{WHITE} {/*Ignore*/}
-"###" {lexeme="<h2>"; return TITLE;}
-"**" {return NEGRO;}
-{L}({L}|{D})* {lexeme=yytext(); return ID;}
+
+{TITLE} {lexeme = yytext(); return TITLE;}
+{NEGRITA} {lexeme=yytext(); return NEGRITA;}
+{TEXTO} {lexeme=yytext(); return TEXTO;}
 . {return ERROR;}
