@@ -49,8 +49,13 @@ public class Main {
                 System.out.println(resultado);
                 return;
             }
-            switch (token){
-                case 2:
+            for (int i = 0; i < rules.size(); i++) {
+                if(token == rules.get(i).getId())
+                    System.out.println("Encontre " + rules.get(i).getName());
+                
+            }
+            /*switch (token){
+                case 1:
                     System.out.println("encontre un titulo");
                     
                     break;
@@ -61,20 +66,20 @@ public class Main {
                     }else{
                        resultado = resultado+"</b>"; 
                        negro = 0;
-                    }*/
+                    }
                     System.out.println("encontre algo en negrita");
                     break;
                 case -1:
                     resultado=resultado+ "Error, simbolo no reconocido ";
                     break;
-                case 1: {
+                case 2: {
                     System.out.println("encontre solo texto");
                     break;
                 }
                 
                 default:
                     System.out.println("entre a default");
-            }
+            }*/
         }
     }
     
@@ -98,7 +103,7 @@ public class Main {
             System.out.println("No hay reglas cargadas o no respetan la convencion");
             return;
         }
-        String from = s[1].replace(" ","");
+        String from = s[1].replace(" ","").replace("TEXT", ""); // por ahora es asi
         String name = s[0].replace(" ","");
         String to = s[2].replace(" ","");
         Rule newRule = new Rule(name,from,to,rules.size()+1);
@@ -109,7 +114,7 @@ public class Main {
     private static void createFlexFile() throws IOException{
         FileWriter fw = new FileWriter("src/tesis/Lexer.flex");
         PrintWriter pw = new PrintWriter(fw);
-        pw.print("package tesis;\n" +
+        String text = "package tesis;\n" +
                 "%%\n" +
                 "%class Lexer\n" +
                 "%type Integer\n" +
@@ -119,8 +124,23 @@ public class Main {
                 "\n" +
                 "LineTerminator = \\r|\\n|\\r\\n\n" +
                 "WhiteSpace     = {LineTerminator} | [ \\t\\f]\n" +
-                "InputCharacter = [^\\r\\n]\n "
-                + "TITLE = \"###\" {InputCharacter}* {LineTerminator}?\n" +
+                "InputCharacter = [^\\r\\n]\n ";
+        for (int i = 0; i < rules.size(); i++) {
+            text += rules.get(i).getName() + " = \""+ rules.get(i).getFrom() +"\" {InputCharacter}* {LineTerminator}?\n";
+        }
+        text += "\n" +
+                "%{\n" +
+                "public String lexeme;\n" +
+                "%}\n" +
+                "%%\n" +
+                "\n";
+        for (int i = 0; i < rules.size(); i++) {
+            text +=   "{"+rules.get(i).getName()+"} {lexeme = yytext(); return "+rules.get(i).getId()+";}\n";     
+        }
+        text +=  ". {return -1;}";
+        pw.print(text);
+        /*pw.print(
+                + rules.get(0).getName() + " = \""+ rules.get(0).getFrom() +"\" {InputCharacter}* {LineTerminator}?\n" +
                 "BOLD = \"**\" {TEXT} \"**\" {InputCharacter}* {LineTerminator}?\n" +
                 "\n" +
                 "%{\n" +
@@ -128,10 +148,10 @@ public class Main {
                 "%}\n" +
                 "%%\n" +
                 "\n" +
-                "{TITLE} {lexeme = yytext(); return 2;}\n" +
+                "{"+rules.get(0).getName()+"} {lexeme = yytext(); return "+rules.get(0).getId()+";}\n" +
                 "{BOLD} {lexeme=yytext(); return 3;}\n" +
-                "{TEXT} {lexeme=yytext(); return 1;}\n" +
-                ". {return -1;}");
+                "{TEXT} {lexeme=yytext(); return 2;}\n" +
+                ". {return -1;}");*/
         
         pw.close();
     }

@@ -1,2 +1,2 @@
 TITLE -> ###TEXT -> <h2>TEXT</h2>
-BOLD -> **TEXT** -> <bold>TEXT</bold>
+BOLD -> **TEXT -> <bold>TEXT</bold>

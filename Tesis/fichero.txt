@@ -1,3 +1,2 @@
-###esto es un titulo 
-**esto esta en negrita**
-esto es solo texto
+###esto es un titulo
+** negrita
