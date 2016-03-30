@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
@@ -21,14 +22,10 @@ import java.util.logging.Logger;
 import jflex.*;
 import static jflex.Main.generate;
 
-/**
- *
- * @author alangonzalez
- */
 public class Main {
 
-    private static String RuleSeparator = "->";
-    private static String Text = "text";
+    private static final String RULE_SEPARATOR = "->";
+    private static String Text = "TEXT";
     public static ArrayList<Rule> rules = new ArrayList();
     static int negro = 0;
     /**
@@ -36,28 +33,28 @@ public class Main {
      */
     public static void main(String[] args) throws IOException {
         loadRules();
-        File file=new File("Lexer.flex");
+        File file=new File("src/tesis/Lexer.flex");
         generate(file);
         System.out.println("\n***EJECUTANDO ANALIZADOR***\n");
         probarLexerFile();
     }
     
-    public static void probarLexerFile() throws IOException{
+   public static void probarLexerFile() throws IOException{
         Reader reader = new BufferedReader(new FileReader("fichero.txt"));
         Lexer lexer = new Lexer (reader);
         String resultado="";
         while (true){
-            Token token =lexer.yylex();
+            Integer token =lexer.yylex();
             if (token == null){
                 System.out.println(resultado);
                 return;
             }
             switch (token){
-                case TITLE:
+                case 2:
                     System.out.println("encontre un titulo");
                     
                     break;
-                case BOLD:
+                case 3:
                     /*if(negro == 0){
                         negro = 1;
                         resultado = resultado+"<b>";
@@ -67,10 +64,10 @@ public class Main {
                     }*/
                     System.out.println("encontre algo en negrita");
                     break;
-                case ERROR:
+                case -1:
                     resultado=resultado+ "Error, simbolo no reconocido ";
                     break;
-                case TEXT: {
+                case 1: {
                     System.out.println("encontre solo texto");
                     break;
                 }
@@ -92,10 +89,11 @@ public class Main {
         } finally {
             br.close();
         }
+        createFlexFile();
     }
     
     private static void ruleParser(String rule){
-        String[] s = rule.split(RuleSeparator);
+        String[] s = rule.split(RULE_SEPARATOR);
         if(s.length != 3){
             System.out.println("No hay reglas cargadas o no respetan la convencion");
             return;
@@ -103,9 +101,39 @@ public class Main {
         String from = s[1].replace(" ","");
         String name = s[0].replace(" ","");
         String to = s[2].replace(" ","");
-        Rule newRule = new Rule(name,from,to);
+        Rule newRule = new Rule(name,from,to,rules.size()+1);
         System.out.println(newRule.toString());
         rules.add(newRule);
+    }
+    
+    private static void createFlexFile() throws IOException{
+        FileWriter fw = new FileWriter("src/tesis/Lexer.flex");
+        PrintWriter pw = new PrintWriter(fw);
+        pw.print("package tesis;\n" +
+                "%%\n" +
+                "%class Lexer\n" +
+                "%type Integer\n" +
+                "%line\n" +
+                "\n" +
+                "TEXT = [A-Za-z_ ][A-Za-z_0-9 ]*\n" +
+                "\n" +
+                "LineTerminator = \\r|\\n|\\r\\n\n" +
+                "WhiteSpace     = {LineTerminator} | [ \\t\\f]\n" +
+                "InputCharacter = [^\\r\\n]\n "
+                + "TITLE = \"###\" {InputCharacter}* {LineTerminator}?\n" +
+                "BOLD = \"**\" {TEXT} \"**\" {InputCharacter}* {LineTerminator}?\n" +
+                "\n" +
+                "%{\n" +
+                "public String lexeme;\n" +
+                "%}\n" +
+                "%%\n" +
+                "\n" +
+                "{TITLE} {lexeme = yytext(); return 2;}\n" +
+                "{BOLD} {lexeme=yytext(); return 3;}\n" +
+                "{TEXT} {lexeme=yytext(); return 1;}\n" +
+                ". {return -1;}");
+        
+        pw.close();
     }
     
 }

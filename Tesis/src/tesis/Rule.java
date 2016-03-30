@@ -14,11 +14,13 @@ public class Rule {
     private String name;
     private String from;
     private String to;
+    private int id;
 
-    public Rule(String name, String from, String to) {
+    public Rule(String name, String from, String to, int id) {
         this.name = name;
         this.from = from;
         this.to = to;
+        this.id = id;
     }
 
     public Rule() {
@@ -50,10 +52,19 @@ public class Rule {
         this.to = to;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "Rule{" + "name=" + name + ", from=" + from + ", to=" + to + '}';
+        return "Rule{" + "name=" + name + ", from=" + from + ", to=" + to + ", id=" + id + '}';
     }
+
     
     
     
