@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -26,12 +27,16 @@ import static jflex.Main.generate;
  */
 public class Main {
 
+    private static String RuleSeparator = "->";
+    private static String Text = "text";
+    public static ArrayList<Rule> rules = new ArrayList();
     static int negro = 0;
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        File file=new File("/Users/alangonzalez/Desktop/tesis/Tesis/Tesis/src/tesis/Lexer.flex");
+        loadRules();
+        File file=new File("Lexer.flex");
         generate(file);
         System.out.println("\n***EJECUTANDO ANALIZADOR***\n");
         probarLexerFile();
@@ -52,7 +57,7 @@ public class Main {
                     System.out.println("encontre un titulo");
                     
                     break;
-                case NEGRITA:
+                case BOLD:
                     /*if(negro == 0){
                         negro = 1;
                         resultado = resultado+"<b>";
@@ -65,7 +70,7 @@ public class Main {
                 case ERROR:
                     resultado=resultado+ "Error, simbolo no reconocido ";
                     break;
-                case TEXTO: {
+                case TEXT: {
                     System.out.println("encontre solo texto");
                     break;
                 }
@@ -73,7 +78,34 @@ public class Main {
                 default:
                     System.out.println("entre a default");
             }
+        }
     }
- }
+    
+    private static void loadRules() throws FileNotFoundException, IOException {
+        BufferedReader br = new BufferedReader(new FileReader("rules.txt"));
+        try {
+            String line = br.readLine();
+            while (line != null) {
+                ruleParser(line);
+                line = br.readLine();
+            }
+        } finally {
+            br.close();
+        }
+    }
+    
+    private static void ruleParser(String rule){
+        String[] s = rule.split(RuleSeparator);
+        if(s.length != 3){
+            System.out.println("No hay reglas cargadas o no respetan la convencion");
+            return;
+        }
+        String from = s[1].replace(" ","");
+        String name = s[0].replace(" ","");
+        String to = s[2].replace(" ","");
+        Rule newRule = new Rule(name,from,to);
+        System.out.println(newRule.toString());
+        rules.add(newRule);
+    }
     
 }

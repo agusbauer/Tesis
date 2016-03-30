@@ -1,4 +1,2 @@
-#text -> <h1>text</h1>
-##text -> <h2>text</h2>
-###text -> <h3>text</h3>
-####text -> <h4>text</h4>
+TITLE -> ###TEXT -> <h2>TEXT</h2>
+BOLD -> **TEXT** -> <bold>TEXT</bold>
