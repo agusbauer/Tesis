@@ -14,9 +14,9 @@ public class Rule {
     private String name;
     private String from;
     private String to;
-    private Integer id;
+    private int id;
 
-    public Rule(String name, String from, String to, Integer id) {
+    public Rule(String name, String from, String to, int id) {
         this.name = name;
         this.from = from;
         this.to = to;
@@ -27,7 +27,6 @@ public class Rule {
         this.name = "";
         this.from = "";
         this.to = "";
-        this.id = -1;
     }
     public String getName() {
         return name;
@@ -53,11 +52,11 @@ public class Rule {
         this.to = to;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
