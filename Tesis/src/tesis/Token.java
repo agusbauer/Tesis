@@ -4,6 +4,6 @@ package tesis;
  *
  * @author Alan
  */
-public class Token {
-    
+public enum Token {
+    TEXT, TITLE, BOLD, ERROR
 }
