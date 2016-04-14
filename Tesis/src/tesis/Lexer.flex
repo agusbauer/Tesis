@@ -9,14 +9,18 @@ TEXT = [A-Za-z_ ][A-Za-z_0-9 ]*
 LineTerminator = \r|\n|\r\n
 WhiteSpace     = {LineTerminator} | [ \t\f]
 InputCharacter = [^\r\n]
- TITLE = "###" {InputCharacter}* {LineTerminator}?
-BOLD = "**" {InputCharacter}* {LineTerminator}?
+TITLE = "###" {TEXT} {InputCharacter}* {LineTerminator}?
+BOLD = "*" {TEXT} "*"
+ITALIC = "#" {TEXT} "#"
 
 %{
 public String lexeme;
 %}
 %%
 
-{TITLE} {lexeme = yytext(); return 1;}
+{TEXT} {lexeme = yytext();return 0;}
+{LineTerminator} {lexeme = yytext(); return -1;}
+{TITLE} {lexeme = yytext();return 1;}
 {BOLD} {lexeme = yytext(); return 2;}
-. {return -1;}
+{ITALIC} {lexeme = yytext();return 3;}
+. {lexeme = yytext(); return -3;}

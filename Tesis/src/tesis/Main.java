@@ -32,6 +32,7 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
+        //rules.add(new Rule("TEXT","","",0));
         loadRules();
         File file=new File("src/tesis/Lexer.flex");
         generate(file);
@@ -49,10 +50,28 @@ public class Main {
                 System.out.println(resultado);
                 return;
             }
-            for (int i = 0; i < rules.size(); i++) {
-                if(token == rules.get(i).getId())
-                    System.out.println("Encontre " + rules.get(i).getName());
-                
+            
+            if(token > 0){
+                for (int i = 0; i < rules.size(); i++) {
+                    if(token == rules.get(i).getId()){
+                        //System.out.println("Encontre " + rules.get(i).getName());
+                        String s1 = lexer.lexeme.replace(rules.get(i).getBegin(), "");
+                        if(rules.get(i).getEnd() != null){
+                            s1 = s1.replace(rules.get(i).getEnd(), "");
+                        }
+                        //s1 = ;
+                        s1 = rules.get(i).getToBegin() + s1 + rules.get(i).getToEnd();
+                        System.out.print(s1);
+                    }             
+                }
+            }
+            else{
+                if(token == -1){
+                     System.out.print(lexer.lexeme);
+                }
+                else{
+                    System.out.print(lexer.lexeme);
+                }
             }
             /*switch (token){
                 case 1:
@@ -94,7 +113,7 @@ public class Main {
         } finally {
             br.close();
         }
-        createFlexFile();
+       // createFlexFile();
     }
     
     private static void ruleParser(String rule){
@@ -103,15 +122,30 @@ public class Main {
             System.out.println("No hay reglas cargadas o no respetan la convencion");
             return;
         }
-        String from = s[1].replace(" ","").replace("TEXT", ""); // por ahora es asi
+        String[] r1 = s[1].replace(" ","").split("TEXT");
+        String begin = "";
+        String end = null;
+        begin = r1[0];
+        if(r1.length == 2){          
+            end = r1[1];
+        }
+      //  String from = s[1].replace(" ","").replace("TEXT", ""); // por ahora es asi
         String name = s[0].replace(" ","");
-        String to = s[2].replace(" ","");
-        Rule newRule = new Rule(name,from,to,rules.size()+1);
+        
+        String[] r2 = s[2].replace(" ","").split("TEXT");
+        String tobegin = "";
+        String toend = null;
+        tobegin = r2[0];
+        if(r2.length > 1){          
+            toend = r2[1];
+        }
+       // String to = s[2].replace(" ","");
+        Rule newRule = new Rule(name,begin,end,tobegin,toend,rules.size()+1);
         System.out.println(newRule.toString());
         rules.add(newRule);
     }
     
-    private static void createFlexFile() throws IOException{
+   /* private static void createFlexFile() throws IOException{
         FileWriter fw = new FileWriter("src/tesis/Lexer.flex");
         PrintWriter pw = new PrintWriter(fw);
         String text = "package tesis;\n" +
@@ -151,9 +185,9 @@ public class Main {
                 "{"+rules.get(0).getName()+"} {lexeme = yytext(); return "+rules.get(0).getId()+";}\n" +
                 "{BOLD} {lexeme=yytext(); return 3;}\n" +
                 "{TEXT} {lexeme=yytext(); return 2;}\n" +
-                ". {return -1;}");*/
+                ". {return -1;}");
         
         pw.close();
-    }
+    }*/
     
 }

@@ -12,21 +12,32 @@ package tesis;
 public class Rule {
     
     private String name;
-    private String from;
-    private String to;
+    private String begin;
+    private String end;
+    private String toBegin;
+    private String toEnd;
     private Integer id;
-
+    
     public Rule(String name, String from, String to, Integer id) {
         this.name = name;
-        this.from = from;
-        this.to = to;
+        this.begin = from;
+        this.end = to;
+        this.id = id;
+    }
+
+    public Rule(String name, String begin, String end, String toBegin, String toEnd, Integer id) {
+        this.name = name;
+        this.begin = begin;
+        this.end = end;
+        this.toBegin = toBegin;
+        this.toEnd = toEnd;
         this.id = id;
     }
 
     public Rule() {
         this.name = "";
-        this.from = "";
-        this.to = "";
+        this.begin = "";
+        this.end = "";
         this.id = -1;
     }
     public String getName() {
@@ -37,20 +48,36 @@ public class Rule {
         this.name = name;
     }
 
-    public String getFrom() {
-        return from;
+    public String getBegin() {
+        return begin;
     }
 
-    public void setFrom(String from) {
-        this.from = from;
+    public void setBegin(String begin) {
+        this.begin = begin;
     }
 
-    public String getTo() {
-        return to;
+    public String getToBegin() {
+        return toBegin;
     }
 
-    public void setTo(String to) {
-        this.to = to;
+    public void setToBegin(String toBegin) {
+        this.toBegin = toBegin;
+    }
+
+    public String getToEnd() {
+        return toEnd;
+    }
+
+    public void setToEnd(String toEnd) {
+        this.toEnd = toEnd;
+    }
+
+    public String getEnd() {
+        return end;
+    }
+
+    public void setEnd(String end) {
+        this.end = end;
     }
 
     public Integer getId() {
@@ -63,10 +90,8 @@ public class Rule {
 
     @Override
     public String toString() {
-        return "Rule{" + "name=" + name + ", from=" + from + ", to=" + to + ", id=" + id + '}';
+        return "Rule{" + "name=" + name + ", begin=" + begin + ", end=" + end + ", toBegin=" + toBegin + ", toEnd=" + toEnd + ", id=" + id + '}';
     }
-
-    
     
     
 }

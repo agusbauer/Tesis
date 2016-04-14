@@ -1,2 +1,2 @@
-###esto es un titulo
-** negrita
+###Mi mamá me mima mucho
+esto es un texto que tiene una palabra *en negrita* y otra en #cursiva#
