@@ -1,2 +1,5 @@
-###Mi mamá me mima mucho
-esto es un texto que tiene una palabra *en negrita* y otra en #cursiva#
+###Mi mamá me mima muchodd
+%parrafoooooooooo%
+esto es un texto que tiene una palabra *en negrita* y otra en $cursiva$
+#amigueitor1
+##hermaneitor

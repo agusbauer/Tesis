@@ -25,9 +25,8 @@ import static jflex.Main.generate;
 public class Main {
 
     private static final String RULE_SEPARATOR = "->";
-    private static String Text = "TEXT";
+    private static String TEXT = "TEXT";
     public static ArrayList<Rule> rules = new ArrayList();
-    static int negro = 0;
     /**
      * @param args the command line arguments
      */
@@ -43,35 +42,31 @@ public class Main {
    public static void probarLexerFile() throws IOException{
         Reader reader = new BufferedReader(new FileReader("fichero.txt"));
         Lexer lexer = new Lexer (reader);
-        String resultado="";
+        String result="";
         while (true){
             Integer token =lexer.yylex();
             if (token == null){
-                System.out.println(resultado);
+                System.out.println(result);
                 return;
             }
-            
-            if(token > 0){
+            if(token > 0){ //el id del token pertenece a una regla
                 for (int i = 0; i < rules.size(); i++) {
                     if(token == rules.get(i).getId()){
-                        //System.out.println("Encontre " + rules.get(i).getName());
                         String s1 = lexer.lexeme.replace(rules.get(i).getBegin(), "");
                         if(rules.get(i).getEnd() != null){
                             s1 = s1.replace(rules.get(i).getEnd(), "");
+                            s1 = rules.get(i).getToBegin() + s1 + rules.get(i).getToEnd();
                         }
-                        //s1 = ;
-                        s1 = rules.get(i).getToBegin() + s1 + rules.get(i).getToEnd();
-                        System.out.print(s1);
+                        else{
+                            s1 = s1.replace("\n",""); //saca el salto de linea que se pone cuando end es null
+                            s1 = rules.get(i).getToBegin() + s1 + rules.get(i).getToEnd() + "\n";
+                        }                      
+                        result += s1;
                     }             
                 }
             }
-            else{
-                if(token == -1){
-                     System.out.print(lexer.lexeme);
-                }
-                else{
-                    System.out.print(lexer.lexeme);
-                }
+            else{ //el id del token no pertenece a una regla
+                result += lexer.lexeme;
             }
             /*switch (token){
                 case 1:
@@ -102,6 +97,7 @@ public class Main {
         }
     }
     
+   /*Lee las reglas del archivo y usa ruleParser y createFlexFile*/
     private static void loadRules() throws FileNotFoundException, IOException {
         BufferedReader br = new BufferedReader(new FileReader("rules.txt"));
         try {
@@ -113,9 +109,10 @@ public class Main {
         } finally {
             br.close();
         }
-       // createFlexFile();
+        createFlexFile();
     }
     
+    /*pasa una regla de string al objeto Rule y la agrega a la lista, formato: nombre -> desde -> hasta */
     private static void ruleParser(String rule){
         String[] s = rule.split(RULE_SEPARATOR);
         if(s.length != 3){
@@ -129,7 +126,6 @@ public class Main {
         if(r1.length == 2){          
             end = r1[1];
         }
-      //  String from = s[1].replace(" ","").replace("TEXT", ""); // por ahora es asi
         String name = s[0].replace(" ","");
         
         String[] r2 = s[2].replace(" ","").split("TEXT");
@@ -145,49 +141,43 @@ public class Main {
         rules.add(newRule);
     }
     
-   /* private static void createFlexFile() throws IOException{
+   /*Crea el archivo flex en base a las reglas que hay en la lista*/
+    private static void createFlexFile() throws IOException{
         FileWriter fw = new FileWriter("src/tesis/Lexer.flex");
         PrintWriter pw = new PrintWriter(fw);
         String text = "package tesis;\n" +
-                "%%\n" +
-                "%class Lexer\n" +
-                "%type Integer\n" +
-                "%line\n" +
-                "\n" +
-                "TEXT = [A-Za-z_ ][A-Za-z_0-9 ]*\n" +
-                "\n" +
-                "LineTerminator = \\r|\\n|\\r\\n\n" +
-                "WhiteSpace     = {LineTerminator} | [ \\t\\f]\n" +
-                "InputCharacter = [^\\r\\n]\n ";
+                    "%%\n" +
+                    "%class Lexer\n" +
+                    "%type Integer\n" +
+                    "%line\n" +
+                    "\n" +
+                    "TEXT = [A-Za-z_ ][A-Za-z_0-9 ]*\n" +
+                    "\n" +
+                    "LineTerminator = \\r|\\n|\\r\\n\n" +
+                    "WhiteSpace     = {LineTerminator} | [ \\t\\f]\n" +
+                    "InputCharacter = [^\\r\\n] \n";
         for (int i = 0; i < rules.size(); i++) {
-            text += rules.get(i).getName() + " = \""+ rules.get(i).getFrom() +"\" {InputCharacter}* {LineTerminator}?\n";
+            if(rules.get(i).getEnd() == null){ //es una regla con solo marcador de inicio
+                text += rules.get(i).getName() + " = \""+ rules.get(i).getBegin() +"\" {TEXT} {InputCharacter}* {LineTerminator}?\n";
+            }
+            else{ //es una regla con marcador de inicio y de final
+                text += rules.get(i).getName() + " = \""+ rules.get(i).getBegin() +"\" {TEXT} \"" + rules.get(i).getEnd() + "\"\n";
+            }
         }
         text += "\n" +
                 "%{\n" +
                 "public String lexeme;\n" +
                 "%}\n" +
                 "%%\n" +
-                "\n";
+                "\n"
+                + "{TEXT} {lexeme = yytext();return 0;}\n" +
+                   "{LineTerminator} {lexeme = yytext(); return -1;}\n";
         for (int i = 0; i < rules.size(); i++) {
             text +=   "{"+rules.get(i).getName()+"} {lexeme = yytext(); return "+rules.get(i).getId()+";}\n";     
         }
-        text +=  ". {return -1;}";
-        pw.print(text);
-        /*pw.print(
-                + rules.get(0).getName() + " = \""+ rules.get(0).getFrom() +"\" {InputCharacter}* {LineTerminator}?\n" +
-                "BOLD = \"**\" {TEXT} \"**\" {InputCharacter}* {LineTerminator}?\n" +
-                "\n" +
-                "%{\n" +
-                "public String lexeme;\n" +
-                "%}\n" +
-                "%%\n" +
-                "\n" +
-                "{"+rules.get(0).getName()+"} {lexeme = yytext(); return "+rules.get(0).getId()+";}\n" +
-                "{BOLD} {lexeme=yytext(); return 3;}\n" +
-                "{TEXT} {lexeme=yytext(); return 2;}\n" +
-                ". {return -1;}");
-        
+        text +=  ". {return -3;}";
+        pw.print(text);       
         pw.close();
-    }*/
+    }
     
 }
