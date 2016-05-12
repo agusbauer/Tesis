@@ -109,7 +109,7 @@ public class Main {
         } finally {
             br.close();
         }
-        createFlexFile();
+        //createFlexFile();
     }
     
     /*pasa una regla de string al objeto Rule y la agrega a la lista, formato: nombre -> desde -> hasta */

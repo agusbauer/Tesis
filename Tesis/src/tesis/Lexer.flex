@@ -15,6 +15,9 @@ TITLE = "#" {TEXT} {InputCharacter}* {LineTerminator}?
 BOLD = "*" {TEXT} "*"
 ITAlIC = "$" {TEXT} "$"
 PARAPH = "%" {TEXT} "%"
+ITEM = "-" {TEXT} {InputCharacter}* {LineTerminator}?
+LISTA = "&" {InputCharacter}* {LineTerminator}? {ITEM}* "&"
+ANIDADO = "=" {TEXT} "="
 
 %{
 public String lexeme;
@@ -29,4 +32,7 @@ public String lexeme;
 {BOLD} {lexeme = yytext(); return 4;}
 {ITAlIC} {lexeme = yytext(); return 5;}
 {PARAPH} {lexeme = yytext(); return 6;}
+{ITEM} {lexeme = yytext(); return 7;}
+{ANIDADO} {lexeme = yytext(); return 8;}
+{LISTA} {System.out.println("enronctre lista"); lexeme = "<ul>"+yytext()+"</u>"; return -1;}
 . {return -3;}
