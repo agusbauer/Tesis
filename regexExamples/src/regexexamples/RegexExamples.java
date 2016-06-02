@@ -17,10 +17,6 @@ import jregex.Pattern;
 import jregex.Replacer;
 
 
-/**
- *
- * @author alangonzalez
- */
 public class RegexExamples {
 
     private static final String RULE_SEPARATOR = "->";
@@ -28,6 +24,7 @@ public class RegexExamples {
     private static final int RULE_NAME = 0;
     private static final int ORIGINAL_EXPRESSION = 1;
     private static final int REPLACER_EXPRESSION = 2;
+    private static final String SPECIAL_CHARACTERS = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
    // private static final int RULE_INDEX_COUNT = 3;
     public static ArrayList<Rule> rules = new ArrayList();
     
@@ -40,32 +37,9 @@ public class RegexExamples {
         } catch (IOException ex) {
             Logger.getLogger(RegexExamples.class.getName()).log(Level.SEVERE, null, ex);
         }
-        String texto = "esto es texto con una palabra en *negrita* otra en #cursiva# y otra en #*negritacursiva*# y *#otra#*";
-        for (int i = 0; i < rules.size(); i++) {
-            Pattern pattern = new Pattern(rules.get(i).getOriginalExpression());
-            Replacer replacer = pattern.replacer(rules.get(i).getReplacerExpression());
-            texto = replacer.replace(texto);
-        }
-        System.out.println(texto);
-         /*Pattern bold = new Pattern("\\*(\\p{Graph}+\\s*)\\*"); //bold
-            Pattern italic = new Pattern("#(\\p{Graph}+\\s*)#"); //italic
-            
-            //Texto a parsear que tiene palabras en negrita, cursiva y combinadas de las dos formas
-            String texto = "esto es texto con una palabra en *negr ita* otra en #cursiva# y otra en #*negritacursiva*# y *#otra#*";
-            String result = "";
-            
-            //Primero reemplazo las negritas
-            Replacer r = bold.replacer("<strong>$1</strong>");
-            texto = r.replace(texto);
-            //imprimo lo que resulta solo de reemplazar negritas
-            System.out.println(texto);
-            
-            //Tomo el texto con las negritas ya reemplazadas y reemplazo las cursivas
-            Replacer translatedExpr = italic.replacer("<em>$1</em>");
-            result = translatedExpr.replace(texto);
-            
-            //Muestro resultado final
-            System.out.println(result);*/
+        String texto = "esto es texto con una pala bra en *ne  grita* otra en #cursiva# y otra en #sfdsfs  *negritacursiva* vhhhgc# y *#otra#*";
+        String result = translate(texto);
+        System.out.println(result);
         
     }
     
@@ -85,6 +59,15 @@ public class RegexExamples {
         }   
     }
     
+    private static String translate(String textToTranslate){
+        for (int i = 0; i < rules.size(); i++) {
+            Pattern pattern = new Pattern(rules.get(i).getOriginalExpression());
+            Replacer replacer = pattern.replacer(rules.get(i).getReplacerExpression());
+            textToTranslate = replacer.replace(textToTranslate);
+        }
+        return textToTranslate;
+    }
+    
     private static Rule textToRule(String line){
         String[] splittedLine = line.split(RULE_SEPARATOR);
         if(splittedLine.length != 3){ //a correct rule must be splitted in 3 parts
@@ -102,32 +85,32 @@ public class RegexExamples {
         final int END_TOKEN = 1;
         String result = "";
         String[] splittedExpr = commonExpression.replace(" ","").split(TEXT); // array example = {#,#}
-        
+        String spCharWithoutCurrToken = SPECIAL_CHARACTERS.replace(splittedExpr[INITIAL_TOKEN], "");
         /*add escapes characters*/
         splittedExpr[INITIAL_TOKEN] = addEscapeCharacters(splittedExpr[INITIAL_TOKEN]);
         if(splittedExpr.length > 1){
             splittedExpr[END_TOKEN] = addEscapeCharacters(splittedExpr[END_TOKEN]);
         }
+        spCharWithoutCurrToken =  addEscapeCharacters(spCharWithoutCurrToken);
         
         if(!isReplacer){
             if(splittedExpr.length > 1)
-                result += splittedExpr[INITIAL_TOKEN] + "(\\p{Graph}+\\s*)" + splittedExpr[END_TOKEN];
+                result +=  splittedExpr[INITIAL_TOKEN] + "([\\p{Alpha}\\p{Space}"+ spCharWithoutCurrToken +"]*)" + splittedExpr[END_TOKEN]; //\\p{Graph}&&^"+splittedExpr[INITIAL_TOKEN]+
             else
-                result += splittedExpr[INITIAL_TOKEN] + "(\\p{Graph}+\\s*)";
+                result += splittedExpr[INITIAL_TOKEN] + "((\\p{Graph})*)";
         }
         else{
             if(splittedExpr.length > 1)
                 result += splittedExpr[INITIAL_TOKEN] + "$1" + splittedExpr[END_TOKEN];
             else
                 result += splittedExpr[INITIAL_TOKEN] + "$1";
-        }
-        
+        }      
         return result;
     }
     
     private static String addEscapeCharacters(String expression){
         String result = expression;
-        String[] charactersToEscape = {"*","+"};
+        String[] charactersToEscape = {"*","+","{","}"};
         for (String character : charactersToEscape) {
             result = result.replace(character, "\\" + character);
         }
